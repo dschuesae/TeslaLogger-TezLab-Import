@@ -1,7 +1,7 @@
 # TeslaLogger-TezLab-Import
 [![Contributors][contributors-shield]][contributors-url] [![Forks][forks-shield]][forks-url] [![Stargazers][stars-shield]][stars-url] [![Issues][issues-shield]][issues-url]
 
-Feel free to use this quick and dirty Importer from TezLab export files to [Teslalogger](https://github.com/bassmaster187/TeslaLogger). 
+Feel free to use this quick and dirty Importer from TezLab export files to [Teslalogger](https://github.com/dschuesae/TeslaLogger-TezLab-Import). 
 
 Get the source of this repository and open it in Visual Studio (Visual Studio Code could work too, but I never tried it).
 
@@ -12,3 +12,14 @@ Get the source of this repository and open it in Visual Studio (Visual Studio Co
 Sorry, but there will be no support on this code at all. If it works for you, well great! If not, bad luck.
 
 Contact me, if you want to maintain this code.
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/dschuesae/TeslaLogger-TezLab-Import.svg?style=for-the-badge
+[contributors-url]: https://github.com/dschuesae/TeslaLogger-TezLab-Import/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/dschuesae/TeslaLogger-TezLab-Import.svg?style=for-the-badge
+[forks-url]: https://github.com/dschuesae/TeslaLogger-TezLab-Import/network/members
+[stars-shield]: https://img.shields.io/github/stars/dschuesae/TeslaLogger-TezLab-Import.svg?style=for-the-badge
+[stars-url]: https://github.com/dschuesae/TeslaLogger-TezLab-Import/stargazers
+[issues-shield]: https://img.shields.io/github/issues/dschuesae/TeslaLogger-TezLab-Import.svg?style=for-the-badge
+[issues-url]: https://github.com/dschuesae/TeslaLogger-TezLab-Import/issue
