@@ -10,16 +10,17 @@ using TezLab_Import;
 
 public class Program
 {
-    public static readonly CultureInfo ciEnUS = new CultureInfo("en-US");
+    internal static readonly CultureInfo _ciEnUS = new CultureInfo("en-US");
 
-    //Change CardId here
+    //Change CarId here (default=1)
     private static readonly int CarId = 1;
 
     //Change DBConnectionstring here
-    private static readonly string DBConnectionstring = "Server=dockerraspi;Database=teslalogger;Uid=root;Password=teslalogger;CharSet=utf8mb4;";
+    //private static readonly string DBConnectionstring = "Server=dockerraspi;Database=teslalogger;Uid=root;Password=teslalogger;CharSet=utf8mb4;";
+    private static readonly string DBConnectionstring = "Server=raspberry;Database=teslalogger;Uid=root;Password=teslalogger;CharSet=utf8mb4;";
 
-    //Ratio for my ModelX
-    private static double _currentRangeToBatteryLevel = 4.05;
+    //Default ratio for my ModelX, but with the first Entry, it will update it anyway.
+    private static double CurrentRangeToBatteryLevel = 4.05;
 
     public static void Main(string[] args)
     {
@@ -225,12 +226,12 @@ public class Program
             cmd.Parameters.AddWithValue("@carid", CarId);
             cmd.Parameters.AddWithValue("@Datum", Date.ToString("yyyy-MM-dd HH:mm:ss"));
             cmd.Parameters.AddWithValue("@battery_level", battery_level);
-            cmd.Parameters.AddWithValue("@charge_energy_added", charge_energy_added.ToString(ciEnUS));
-            cmd.Parameters.AddWithValue("@ideal_battery_range_km", range.ToString(ciEnUS));
+            cmd.Parameters.AddWithValue("@charge_energy_added", charge_energy_added.ToString(_ciEnUS));
+            cmd.Parameters.AddWithValue("@ideal_battery_range_km", range.ToString(_ciEnUS));
             if (outside_temp == null)
                 cmd.Parameters.AddWithValue("@outside_temp", DBNull.Value);
             else
-                cmd.Parameters.AddWithValue("@outside_temp", ((double)outside_temp).ToString(ciEnUS));
+                cmd.Parameters.AddWithValue("@outside_temp", ((double)outside_temp).ToString(_ciEnUS));
 
             cmd.ExecuteNonQuery();
 
@@ -252,10 +253,10 @@ public class Program
             cmd.Parameters.AddWithValue("@Pos", posId);
             cmd.Parameters.AddWithValue("@StartChargingID", startChargingId);
             cmd.Parameters.AddWithValue("@EndChargingID", endChargingId);
-            cmd.Parameters.AddWithValue("@charge_energy_added", charge_energy_added.ToString(ciEnUS));
+            cmd.Parameters.AddWithValue("@charge_energy_added", charge_energy_added.ToString(_ciEnUS));
             cmd.Parameters.AddWithValue("@fast_charger_present", fast_charger_present);
-            cmd.Parameters.AddWithValue("@max_charger_power", maxPower.ToString(ciEnUS));
-            cmd.Parameters.AddWithValue("@cost_total", cost.ToString(ciEnUS));
+            cmd.Parameters.AddWithValue("@max_charger_power", maxPower.ToString(_ciEnUS));
+            cmd.Parameters.AddWithValue("@cost_total", cost.ToString(_ciEnUS));
             cmd.ExecuteNonQuery();
         }
     }
@@ -274,7 +275,7 @@ public class Program
             if (outside_temp == null)
                 cmd.Parameters.AddWithValue("@outside_temp", DBNull.Value);
             else
-                cmd.Parameters.AddWithValue("@outside_temp", outside_temp.Value.ToString(ciEnUS));
+                cmd.Parameters.AddWithValue("@outside_temp", outside_temp.Value.ToString(_ciEnUS));
             cmd.ExecuteNonQuery();
         }
     }
@@ -288,22 +289,22 @@ public class Program
             MySqlCommand cmd = new MySqlCommand("insert pos (import, Datum, lat, lng, odometer, ideal_battery_range_km, outside_temp, battery_level, carid) values (1, @Datum, @lat, @lng, @odometer, @ideal_battery_range_km, @outside_temp, @battery_level, @carid )", con);
             cmd.Parameters.AddWithValue("@carid", CarId);
             cmd.Parameters.AddWithValue("@Datum", date.ToString("yyyy-MM-dd HH:mm:ss"));
-            cmd.Parameters.AddWithValue("@lat", latitude.ToString(ciEnUS));
-            cmd.Parameters.AddWithValue("@lng", longitude.ToString(ciEnUS));
-            cmd.Parameters.AddWithValue("@odometer", odometer.ToString(ciEnUS));
-            cmd.Parameters.AddWithValue("@ideal_battery_range_km", range.ToString(ciEnUS));
+            cmd.Parameters.AddWithValue("@lat", latitude.ToString(_ciEnUS));
+            cmd.Parameters.AddWithValue("@lng", longitude.ToString(_ciEnUS));
+            cmd.Parameters.AddWithValue("@odometer", odometer.ToString(_ciEnUS));
+            cmd.Parameters.AddWithValue("@ideal_battery_range_km", range.ToString(_ciEnUS));
 
             if (outside_temp == null)
                 cmd.Parameters.AddWithValue("@outside_temp", DBNull.Value);
             else
-                cmd.Parameters.AddWithValue("@outside_temp", ((double)outside_temp).ToString(ciEnUS));
+                cmd.Parameters.AddWithValue("@outside_temp", ((double)outside_temp).ToString(_ciEnUS));
 
             if (battery_level == null)
-                cmd.Parameters.AddWithValue("@battery_level", Convert.ToInt32(range / _currentRangeToBatteryLevel));
+                cmd.Parameters.AddWithValue("@battery_level", Convert.ToInt32(range / CurrentRangeToBatteryLevel));
             else
             {
                 if (battery_level.Value > 0)
-                    _currentRangeToBatteryLevel = range / battery_level.Value;
+                    CurrentRangeToBatteryLevel = range / battery_level.Value;
                 cmd.Parameters.AddWithValue("@battery_level", battery_level.ToString());
             }
 

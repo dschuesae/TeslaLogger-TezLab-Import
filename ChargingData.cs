@@ -13,9 +13,9 @@
         public bool FastCharging { get; set; }
         public override bool IsChargeState => true;
         public override bool IsDrivingState => false;
-        public double Latitude => double.Parse(Coordinate.Split(',')[0], Program.ciEnUS);
+        public double Latitude => double.Parse(Coordinate.Split(',')[0], Program._ciEnUS);
         public string Location { get; set; }
-        public double Longitude => double.Parse(Coordinate.Split(',')[1], Program.ciEnUS);
+        public double Longitude => double.Parse(Coordinate.Split(',')[1], Program._ciEnUS);
         public int MaxChargerPower { get; set; }
         public double Odometer { get; set; }
         public double RangeAdded { get; set; }
