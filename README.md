@@ -1,7 +1,7 @@
 # TeslaLogger-TezLab-Import
 [![Contributors][contributors-shield]][contributors-url] [![Forks][forks-shield]][forks-url] [![Stargazers][stars-shield]][stars-url] [![Issues][issues-shield]][issues-url]
 
-Feel free to use this quick and dirty Importer from TezLab export files to [Teslalogger](https://github.com/dschuesae/TeslaLogger-TezLab-Import). 
+Feel free to use this quick and dirty Importer from TezLab export files to [TeslaLogger](https://github.com/bassmaster187/TeslaLogger). 
 
 Get the source of this repository and open it in Visual Studio (Visual Studio Code could work too, but I never tried it).
 
