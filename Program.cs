@@ -3,6 +3,7 @@ using CsvHelper.Configuration;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -22,14 +23,24 @@ public class Program
     //Default ratio for my ModelX, but with the first Entry, it will update it anyway.
     private static double CurrentRangeToBatteryLevel = 4.05;
 
+    //Creating negative ids to not creating problems with current data
+    private static int importChargingId = int.MinValue;
+
+    private static int importChargingStateId = int.MinValue;
+    private static int importDriveStateId = int.MinValue;
+    private static int importPosId = int.MinValue;
+
     public static void Main(string[] args)
     {
         DeleteImportData();
         var dtMax = GetFirstTeslaloggerData();
+        var carName = GetCarName();
         var items = new List<DataBase>();
         items.AddRange(GetDrivingData());
         items.AddRange(GetChargingData());
         items = items.Where(it => it.StartTime < dtMax).OrderBy(it => it.StartTime).ToList();
+        if (carName != null)
+            items = items.Where(it => it.VehicleName.Equals(carName, StringComparison.InvariantCulture)).ToList();
         foreach (var item in items)
         {
             if (item is DrivingData drivingData)
@@ -114,7 +125,7 @@ public class Program
     private static void DeleteImportData()
     {
         Console.WriteLine("Deleting Import data");
-        var tables = new string[] { "charging", "chargingstate", "drivestate", "pos" };
+        var tables = new string[] { "charging", "chargingstate", "drivestate", "pos", "state" };
         foreach (var table in tables)
         {
             try
@@ -134,6 +145,17 @@ public class Program
             {
                 Console.WriteLine(ex.ToString());
             }
+        }
+    }
+
+    private static string GetCarName()
+    {
+        using (var con = new MySqlConnection(DBConnectionstring))
+        {
+            con.Open();
+            var cmd = new MySqlCommand("SELECT Display_Name FROM cars where id=@carid", con);
+            cmd.Parameters.AddWithValue("@carid", CarId);
+            return cmd.ExecuteScalar() as string;
         }
     }
 
@@ -221,8 +243,10 @@ public class Program
 
         using (var con = new MySqlConnection(DBConnectionstring))
         {
+            var id = importChargingId++;
             con.Open();
-            var cmd = new MySqlCommand("insert charging (import, Datum, battery_level, charge_energy_added, ideal_battery_range_km, outside_temp, charger_power, carid) values (1, @Datum, @battery_level, @charge_energy_added, @ideal_battery_range_km, @outside_temp, 0, @carid)", con);
+            var cmd = new MySqlCommand("insert charging (import, id, Datum, battery_level, charge_energy_added, ideal_battery_range_km, outside_temp, charger_power, carid) values (1, @id, @Datum, @battery_level, @charge_energy_added, @ideal_battery_range_km, @outside_temp, 0, @carid)", con);
+            cmd.Parameters.AddWithValue("@id", id);
             cmd.Parameters.AddWithValue("@carid", CarId);
             cmd.Parameters.AddWithValue("@Datum", Date.ToString("yyyy-MM-dd HH:mm:ss"));
             cmd.Parameters.AddWithValue("@battery_level", battery_level);
@@ -234,10 +258,7 @@ public class Program
                 cmd.Parameters.AddWithValue("@outside_temp", ((double)outside_temp).ToString(_ciEnUS));
 
             cmd.ExecuteNonQuery();
-
-            cmd = new MySqlCommand("SELECT LAST_INSERT_ID();", con);
-            cmd.Parameters.Clear();
-            return Convert.ToInt32(cmd.ExecuteScalar());
+            return id;
         }
     }
 
@@ -246,7 +267,8 @@ public class Program
         using (var con = new MySqlConnection(DBConnectionstring))
         {
             con.Open();
-            var cmd = new MySqlCommand("insert chargingstate (import, StartDate, EndDate, Pos, StartChargingID, EndChargingID, fast_charger_present, max_charger_power, carid, charge_energy_added, cost_total ) values (1, @StartDate, @EndDate, @Pos, @StartChargingID, @EndChargingID, @fast_charger_present, @max_charger_power, @carid, @charge_energy_added, @cost_total)", con);
+            var cmd = new MySqlCommand("insert chargingstate (import, id, StartDate, EndDate, Pos, StartChargingID, EndChargingID, fast_charger_present, max_charger_power, carid, charge_energy_added, cost_total ) values (1, @id, @StartDate, @EndDate, @Pos, @StartChargingID, @EndChargingID, @fast_charger_present, @max_charger_power, @carid, @charge_energy_added, @cost_total)", con);
+            cmd.Parameters.AddWithValue("@id", importChargingStateId++);
             cmd.Parameters.AddWithValue("@carid", CarId);
             cmd.Parameters.AddWithValue("@StartDate", startDate.ToString("yyyy-MM-dd HH:mm:ss"));
             cmd.Parameters.AddWithValue("@EndDate", endDate.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -266,7 +288,8 @@ public class Program
         using (var con = new MySqlConnection(DBConnectionstring))
         {
             con.Open();
-            var cmd = new MySqlCommand("insert drivestate (import, StartDate, StartPos, EndDate, EndPos, outside_temp_avg, carid) values (1, @StartDate, @StartPosId, @EndDate, @EndPosId, @outside_temp, @carid)", con);
+            var cmd = new MySqlCommand("insert drivestate (import, id, StartDate, StartPos, EndDate, EndPos, outside_temp_avg, carid) values (1, @id, @StartDate, @StartPosId, @EndDate, @EndPosId, @outside_temp, @carid)", con);
+            cmd.Parameters.AddWithValue("@id", importDriveStateId++);
             cmd.Parameters.AddWithValue("@carid", CarId);
             cmd.Parameters.AddWithValue("@StartDate", startDate.ToString("yyyy-MM-dd HH:mm:ss"));
             cmd.Parameters.AddWithValue("@StartPosId", startPosId);
@@ -285,8 +308,10 @@ public class Program
         range = range / 1.248661055853099;
         using (MySqlConnection con = new MySqlConnection(DBConnectionstring))
         {
+            var id = importPosId++;
             con.Open();
-            MySqlCommand cmd = new MySqlCommand("insert pos (import, Datum, lat, lng, odometer, ideal_battery_range_km, outside_temp, battery_level, carid) values (1, @Datum, @lat, @lng, @odometer, @ideal_battery_range_km, @outside_temp, @battery_level, @carid )", con);
+            MySqlCommand cmd = new MySqlCommand("insert pos (import, id, Datum, lat, lng, odometer, ideal_battery_range_km, outside_temp, battery_level, carid) values (1, @id, @Datum, @lat, @lng, @odometer, @ideal_battery_range_km, @outside_temp, @battery_level, @carid )", con);
+            cmd.Parameters.AddWithValue("@id", id);
             cmd.Parameters.AddWithValue("@carid", CarId);
             cmd.Parameters.AddWithValue("@Datum", date.ToString("yyyy-MM-dd HH:mm:ss"));
             cmd.Parameters.AddWithValue("@lat", latitude.ToString(_ciEnUS));
@@ -309,30 +334,7 @@ public class Program
             }
 
             cmd.ExecuteNonQuery();
-
-            cmd = new MySqlCommand("SELECT LAST_INSERT_ID();", con);
-            cmd.Parameters.Clear();
-            return Convert.ToInt32(cmd.ExecuteScalar());
-        }
-    }
-
-    private static int InsertState(DateTime startDate, int startPos, DateTime endDate, int endPos, string state)
-    {
-        using (MySqlConnection con = new MySqlConnection(DBConnectionstring))
-        {
-            con.Open();
-            MySqlCommand cmd = new MySqlCommand("insert state (import, StartDate, EndDate, state, StartPos, EndPos, carid) values (1, @StartDate, @EndDate, @state, @StartPos, @EndPos, @carid)", con);
-            cmd.Parameters.AddWithValue("@carid", CarId);
-            cmd.Parameters.AddWithValue("@StartDate", startDate.ToString("yyyy-MM-dd HH:mm:ss"));
-            cmd.Parameters.AddWithValue("@EndDate", endDate.ToString("yyyy-MM-dd HH:mm:ss"));
-            cmd.Parameters.AddWithValue("@state", state);
-            cmd.Parameters.AddWithValue("@StartPos", startPos);
-            cmd.Parameters.AddWithValue("@EndPos", endPos);
-            cmd.ExecuteNonQuery();
-
-            cmd = new MySqlCommand("SELECT LAST_INSERT_ID();", con);
-            cmd.Parameters.Clear();
-            return Convert.ToInt32(cmd.ExecuteScalar());
+            return id;
         }
     }
 }
