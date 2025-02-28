@@ -4,7 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>TezLab_Import</RootNamespace>
+	  <Version>1.0.0</Version>
   </PropertyGroup>
+
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.0.1" />
@@ -12,8 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ChargingCsvFiles\" />
-    <Folder Include="DrivingCsvFiles\" />
+    <None Update="ChargingCsvFiles\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="DrivingCsvFiles\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
