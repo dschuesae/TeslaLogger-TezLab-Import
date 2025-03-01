@@ -7,7 +7,7 @@
   "targets": {
     ".NETCoreApp,Version=v9.0": {},
     ".NETCoreApp,Version=v9.0/win-x64": {
-      "TezLab-Import/1.0.0": {
+      "TezLab-Import/1.0.1": {
         "dependencies": {
           "CsvHelper": "33.0.1",
           "MySql.Data": "9.2.0",
@@ -982,7 +982,7 @@
     }
   },
   "libraries": {
-    "TezLab-Import/1.0.0": {
+    "TezLab-Import/1.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

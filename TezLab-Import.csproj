@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>TezLab_Import</RootNamespace>
-	  <Version>1.0.0</Version>
+	  <Version>1.0.1</Version>
   </PropertyGroup>
 
 
